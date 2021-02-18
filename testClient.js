@@ -25,16 +25,6 @@ ws.on('open', function open() {
     ws.send(JSON.stringify({inst_id: 1449053277, action: 'Logout'}));
 });
 
-/*
-ws.on('open', function open() {
-    ws.send(JSON.stringify({username: 'orgazm.exe', password: 'G4V92FBf'}));
-});
-*/
-/*
-ws.on('open', function open() {
-    ws.send(JSON.stringify({type: 'Login', username: 'daniel_maybe_still_alive', body: '5KXDLKrbfrgyYrJ'}));
-});
-*/
 ws.on('message', function incoming(data) {
     console.log(data);
 });
