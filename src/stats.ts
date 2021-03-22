@@ -1,5 +1,6 @@
 import puppeteer = require('puppeteer');
 import path = require('path');
+import {createBrowser} from "./browserCreation";
 
 const fs = require('fs-extra');
 
@@ -28,25 +29,29 @@ export async function getFollowers(id: string): Promise<StatsResponse> {
             errorMessage: "User directory doesn't exist",
         }
     }
-    const browser: puppeteer.Browser = await puppeteer.launch({
-        headless: true,
-        userDataDir: path.resolve(__dirname, path.resolve(__dirname, `cookies/${id}`)),
-        args: [
-            '--no-sandbox',
-            '--lang=en-GB'
-        ]
-    });
 
-    const page: puppeteer.Page = await browser.newPage();
+    let browser: puppeteer.Browser = await createBrowser(path.resolve(__dirname, path.resolve(__dirname, `cookies/${id}`)));
+
+    const page: puppeteer.Page = (await browser.pages())[0];
 
     try {
         await page.goto('https://www.instagram.com/');
         await page.waitForTimeout(TIMEOUT);
 
+
+        if (!(await isUserLoggedInInst(page))){
+            return {
+                status: false,
+                inst_id: id,
+                errorMessage: "User isn't logged in",
+            }
+        }
+
+
         let responseObject: any = await page.evaluate(async () => {
             try {
                 const response: Response = await fetch(`https://www.instagram.com/accounts/activity/?__a=1&include_reel=true`);
-                return  response.json();
+                return response.json();
             } catch (e) {
                 return null;
             }
@@ -85,3 +90,13 @@ export async function getFollowers(id: string): Promise<StatsResponse> {
     }
 }
 
+async function isUserLoggedInInst(page: puppeteer.Page): Promise<boolean> {
+    try {
+        let response: boolean = await page.evaluate(async () => {
+            return (await fetch(`https://www.instagram.com/accounts/activity/?__a=1`)).redirected;
+        });
+        return !response;
+    } catch {
+        return false;
+    }
+}

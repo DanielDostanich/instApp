@@ -1,0 +1,10 @@
+proxy:
+  # isEnabled turns on proxy check
+  isEnabled: true
+  # without isExternal server will use proxy data downside
+  isExternal: false
+  url: "http://45.95.99.20:7580"
+  # use isAuth if proxy needs authentication
+  isAuth: false
+  username: "nmvrpple-DE-rotate"
+  password: "9cf8udu7x26b"
